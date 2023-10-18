@@ -6,6 +6,8 @@ const ingredients = document.querySelector(".ingredients")
 const cooking = document.querySelector(".cooking")
 let body= document.querySelector("body")
 let result = document.querySelector(".result")
+let results = document.querySelector(".results")
+let dialog = document.querySelector("dialog")
 
 const searchMeal = async (val) => {
     const res = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${val}`)
@@ -18,9 +20,39 @@ const searchMeal = async (val) => {
         <div class="image">
             <img src="${e.strMealThumb}" alt="">
         </div>
-        <p class="ingredients"></p>
-        <p class="cooking"></p>`
+        `
         result.appendChild(newDiv)
+
+        newDiv.addEventListener("click", ()=>{
+            const ingredients= []
+            for (i = 1 ; i<=20; i++){
+                if (e[`strIngredient${i}`]) {
+                    ingredients.push(`${e[`strIngredient${i}`]} - ${e[`strMeasure${i}`]}`)
+                }
+            }
+            console.log(ingredients);
+            
+            dialog.innerHTML = `<div class="dialog-container">
+            <span class = "cross">x</span>
+            <div class="modal-image">
+              <img src="${e.strMealThumb}" alt="" />
+            </div>
+            <h2 class="modal-title">${e.strMeal}</h2>
+            <p class="ingredients"><h3>Ingredients</h3>${ingredients.join(" ")}</p>
+            <p class="cooking"><h3>Instructions</h3>${e.strInstructions}</p>
+          </div>`
+            dialog.showModal()
+            const cross = document.querySelector(".cross")
+            cross.addEventListener("click", () => {
+                dialog.close()
+            })
+            document.addEventListener("click", (e) =>{
+                e.stopPropagation()
+                if(e.target.innerHTML.includes("dialog-container")){
+                    dialog.close()
+                };
+            })
+        })
     })
     
     
@@ -30,11 +62,14 @@ const searchMeal = async (val) => {
 form.addEventListener("submit", (e)=> {
     e.preventDefault()
     const inputValue = input.value.trim()
+    input.value = ""
     searchMeal(inputValue)
     // console.log(arrWithMeals, typeof arrWithMeals);
     // console.log(arrWithMeals);
 
 })
+
+
 
 
 
